@@ -138,7 +138,7 @@ pipeline {
         waitHealthy('evt-web')
         retry(5) {
           sleep time: 5, unit: 'SECONDS'
-          sh 'docker exec evt-web wget -qO- http://localhost/api/health'
+                    sh 'docker exec evt-web wget -qO- http://127.0.0.1/api/health'
         }
         // Keep only the 3 newest release versions of each image
         sh '''
