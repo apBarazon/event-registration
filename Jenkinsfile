@@ -28,6 +28,7 @@ pipeline {
     TAG              = "${env.BUILD_NUMBER}"           // release version, only created after all tests pass
     DB_ROOT_PASSWORD = 'rootpass'
     DB_PASSWORD      = 'apppass'
+    BASE_URL         = 'http://evt-ci-web'             // test copy of the app, reachable from Jenkins via ci-network
   }
 
   stages {
@@ -36,6 +37,7 @@ pipeline {
       steps {
         dir('server') { sh 'npm install' }
         dir('client') { sh 'npm install' }
+        dir('e2e')    { sh 'npm install' }
       }
     }
 
@@ -93,6 +95,12 @@ pipeline {
       }
     }
 
+    stage('E2E Test') {
+      steps {
+        dir('e2e') { sh 'npm test' }
+      }
+    }
+
     stage('Deploy') {
       when { expression { env.GIT_BRANCH ==~ /(origin\/)?main/ } }
       steps {
@@ -137,7 +145,7 @@ pipeline {
 
   post {
     always {
-      junit allowEmptyResults: true, testResults: 'server/reports/junit.xml,client/reports/junit.xml'
+      junit allowEmptyResults: true, testResults: 'server/reports/junit.xml,client/reports/junit.xml,e2e/reports/junit.xml'
       sh '''
         docker logs evt-ci-db     > ci-db.log     2>&1 || true
         docker logs evt-ci-server > ci-server.log 2>&1 || true
