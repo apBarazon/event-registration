@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import RegisterForm from '../components/RegisterForm';
+import { api } from '../lib';
 
-export default function RegisterPage() {
+export default function RegisterPage({ user }) {
   const { id } = useParams();
   const [busy, setBusy] = useState(false);
   const [result, setResult] = useState(null); // { ok, text }
@@ -10,15 +11,10 @@ export default function RegisterPage() {
   async function submit(values) {
     setBusy(true);
     try {
-      const res = await fetch(`/api/events/${id}/register`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(values),
-      });
-      const data = await res.json().catch(() => ({}));
-      setResult(res.ok ? { ok: true, text: "You're registered!" } : { ok: false, text: data.error || 'Something went wrong' });
-    } catch {
-      setResult({ ok: false, text: 'Network error' });
+      await api(`/events/${id}/register`, { method: 'POST', body: values });
+      setResult({ ok: true, text: "You're registered!" });
+    } catch (err) {
+      setResult({ ok: false, text: err.message });
     } finally {
       setBusy(false);
     }
@@ -27,8 +23,10 @@ export default function RegisterPage() {
   return (
     <>
       <h1>Register for event #{id}</h1>
-      <RegisterForm onSubmit={submit} busy={busy} />
+      <RegisterForm onSubmit={submit} busy={busy} initial={user || {}} />
       {result && <p role={result.ok ? 'status' : 'alert'}>{result.text}</p>}
+      {result?.ok && user && <p><Link to="/my-registrations">View my registrations</Link></p>}
+      {!user && <p className="muted"><Link to="/login">Log in</Link> first if you want to find this registration later.</p>}
     </>
   );
 }

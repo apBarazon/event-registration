@@ -1,8 +1,9 @@
 import { useState } from 'react';
 
-export default function RegisterForm({ onSubmit, busy = false }) {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
+// Used for registering AND for editing a registration (initial + submitLabel)
+export default function RegisterForm({ onSubmit, busy = false, initial = {}, submitLabel = 'Register' }) {
+  const [name, setName] = useState(initial.name || '');
+  const [email, setEmail] = useState(initial.email || '');
   const [error, setError] = useState('');
 
   function handleSubmit(e) {
@@ -22,7 +23,7 @@ export default function RegisterForm({ onSubmit, busy = false }) {
         <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
       </label>
       {error && <p role="alert">{error}</p>}
-      <button type="submit" disabled={busy}>Register</button>
+      <button type="submit" disabled={busy}>{submitLabel}</button>
     </form>
   );
 }

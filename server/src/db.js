@@ -8,4 +8,5 @@ module.exports = mysql.createPool({
   database: process.env.DB_NAME || 'events',
   waitForConnections: true,
   connectionLimit: 10,
+  dateStrings: true, // dates come back as 'YYYY-MM-DD HH:MM:SS' (no timezone surprises)
 });

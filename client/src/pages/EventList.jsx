@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { fmtDate } from '../lib';
 
 export default function EventList() {
   const [events, setEvents] = useState(null);
@@ -18,12 +19,19 @@ export default function EventList() {
   return (
     <>
       <h1>Upcoming events</h1>
-      <ul>
+      <ul className="grid">
         {events.map((ev) => (
           <li key={ev.id}>
-            <strong>{ev.title}</strong> — {ev.location}, {new Date(ev.event_date).toLocaleDateString()}
-            <br />
-            {ev.registered}/{ev.capacity} registered · <Link to={`/events/${ev.id}`}>Register</Link>
+            {ev.image_url ? <img className="cover" src={ev.image_url} alt="" /> : <div className="cover" />}
+            <div className="body">
+              <h2>{ev.title}</h2>
+              <span className="muted">{ev.location} · {fmtDate(ev.event_date)}</span>
+              <div className="foot">
+                <span className="muted">{ev.registered}/{ev.capacity} registered</span>
+                <Link to={`/events/${ev.id}`}>Register</Link>
+              </div>
+            </div>
+            <div className="bar"><span style={{ width: `${Math.min(100, (ev.registered / ev.capacity) * 100)}%` }} /></div>
           </li>
         ))}
       </ul>
