@@ -1,0 +1,16 @@
+{
+  "name": "event-registration-e2e",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": { "test": "jest --runInBand" },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "jest-junit": "^16.0.0",
+    "selenium-webdriver": "^4.25.0"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "testTimeout": 60000,
+    "reporters": ["default", ["jest-junit", { "outputDirectory": "reports", "outputName": "junit.xml" }]]
+  }
+}
