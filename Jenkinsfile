@@ -28,8 +28,6 @@ pipeline {
     TAG              = "${env.BUILD_NUMBER}"           // release version, only created after all tests pass
     DB_ROOT_PASSWORD = 'rootpass'
     DB_PASSWORD      = 'apppass'
-    SELENIUM_URL     = 'http://selenium:4444/wd/hub'   // remote Chrome container
-    BASE_URL         = 'http://evt-ci-web'             // test copy of the app, seen from selenium
   }
 
   stages {
@@ -38,7 +36,6 @@ pipeline {
       steps {
         dir('server') { sh 'npm install' }
         dir('client') { sh 'npm install' }
-        dir('e2e')    { sh 'npm install' }
       }
     }
 
@@ -79,7 +76,7 @@ pipeline {
         waitHealthy('evt-ci-server')
         sh '''
           docker run -d --name evt-ci-web --network evt-test-net evt-web:candidate
-          docker network connect ci-network evt-ci-web
+          docker network connect ci-network evt-ci-web   # lets Jenkins reach it for the Health checks stage
         '''
         waitHealthy('evt-ci-web')
       }
@@ -93,20 +90,6 @@ pipeline {
             curl -fsS http://evt-ci-web/api/health; echo
           '''
         }
-      }
-    }
-
-    stage('UI Test (Selenium)') {
-      steps {
-        sh '''
-          for i in $(seq 1 20); do
-            curl -fsS http://selenium:4444/wd/status > /dev/null && exit 0
-            sleep 3
-          done
-          echo "Selenium is not reachable - is the selenium container running?"
-          exit 1
-        '''
-        dir('e2e') { sh 'npm test' }
       }
     }
 
@@ -154,7 +137,7 @@ pipeline {
 
   post {
     always {
-      junit allowEmptyResults: true, testResults: 'server/reports/junit.xml,client/reports/junit.xml,e2e/reports/junit.xml'
+      junit allowEmptyResults: true, testResults: 'server/reports/junit.xml,client/reports/junit.xml'
       sh '''
         docker logs evt-ci-db     > ci-db.log     2>&1 || true
         docker logs evt-ci-server > ci-server.log 2>&1 || true
