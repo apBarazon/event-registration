@@ -25,5 +25,5 @@ CREATE TABLE IF NOT EXISTS registrations (
 );
 INSERT INTO events (title, location, event_date, capacity) VALUES
  ('Intro to Docker', 'Room A', '2026-11-10 09:00:00', 100),
- ('CI/CD with Jenkins', 'Room B', '2026-11-17 13:00:00', 100),
+ ('CI/CD with Jenkin', 'Room B', '2026-11-17 13:00:00', 100),
  ('React Workshop', 'Main Hall', '2026-11-24 10:00:00', 100);
