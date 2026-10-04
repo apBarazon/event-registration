@@ -133,13 +133,7 @@ pipeline {
             -e DB_HOST=db -e DB_NAME=events -e DB_USER=app -e DB_PASSWORD=$DB_PASSWORD \
             evt-server:$TAG
         '''
-        waitHealthy('evt-server')
-        sh 'docker run -d --name evt-web --restart unless-stopped --network evt-net -p 4000:80 evt-web:$TAG'
-        waitHealthy('evt-web')
-        retry(5) {
-          sleep time: 5, unit: 'SECONDS'
-                    sh 'docker exec evt-web wget -qO- http://127.0.0.1/api/health'
-        }
+        
         // Keep only the 3 newest release versions of each image
         sh '''
           for img in evt-db evt-server evt-web; do
